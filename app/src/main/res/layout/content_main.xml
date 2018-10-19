@@ -50,8 +50,9 @@
         app:elevation="25dp"
         app:itemIconTint="@color/bottom_nav_item_color"
         app:itemTextColor="@color/bottom_nav_item_color"
+        app1:fontFamily="@font/poppins"
         app:menu="@menu/bootomnav"
-        app:itemTextAppearance="@style/bottomNavigationStyle">
+        android:theme="@style/Widget.BottomNavigationView">
 
     </android.support.design.widget.BottomNavigationView>
 

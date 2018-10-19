@@ -8,9 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="NavigationDrawerStyle">
-        <item name="android:textSize">10sp</item>
-        <item name="android:fontFamily">@font/poppins</item>
+    <style name="Widget.BottomNavigationView" parent="Widget.Design.BottomNavigationView">
+        <item name="fontFamily">@font/poppins</item>
     </style>
-
 </resources>

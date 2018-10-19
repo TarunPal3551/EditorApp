@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="colorPrimary">#3f9fff</color>
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:override="true">
+    <color name="colorPrimary">#026dc8</color>
     <color name="colorPrimaryDark">#FF074E96</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorAccent">#8998a5</color>
+    <color name="colororange">#ff6600</color>
+    <color name="colorgreen">#14ed01</color>
+    <color name="selectedfilter">#000</color>
+    <color name="normalfilter">#8a8889</color>
+    <color name="white">#ffffff</color>
 </resources>

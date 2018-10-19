@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         drawerLayout = (DrawerLayout) findViewById(R.id.activity_main);
         imageView = (ImageView) findViewById(R.id.imageViewmenu);
-        optionImage=(ImageView)findViewById(R.id.imageViewoption);
+        optionImage = (ImageView) findViewById(R.id.imageViewoption);
         optionImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,11 +76,13 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager manager = getSupportFragmentManager();
         manager.beginTransaction().replace(R.id.container, homeFragment).commit();
     }
+
     public void switchToFragment2() {
-       GalleryFragment galleryFragment = new GalleryFragment();
+        GalleryFragment galleryFragment = new GalleryFragment();
         FragmentManager manager = getSupportFragmentManager();
         manager.beginTransaction().replace(R.id.container, galleryFragment).commit();
     }
+
     public void switchToFragment3() {
         SettingFragment settingFragment = new SettingFragment();
         FragmentManager manager = getSupportFragmentManager();
@@ -89,15 +91,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(Gravity.START)){
+        if (drawerLayout.isDrawerOpen(Gravity.START)) {
             drawerLayout.closeDrawers();
-        }
-        else {
+        } else {
             super.onBackPressed();
         }
 
 
     }
+
     public void showPopup(View v) {
         PopupMenu popup = new PopupMenu(this, v);
         MenuInflater inflater = popup.getMenuInflater();

@@ -25,12 +25,12 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="20dp"
             android:layout_toEndOf="@+id/nav_profile_imageview"
+            android:layout_toRightOf="@+id/nav_profile_imageview"
             android:text="Hello Tarun!"
             android:textColor="@android:color/white"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textStyle="bold"
-            app:fontFamily="@font/poppins"
-            android:layout_toRightOf="@+id/nav_profile_imageview" />
+            app:fontFamily="@font/poppins" />
 
     </RelativeLayout>
 
