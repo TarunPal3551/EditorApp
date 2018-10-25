@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,16 +24,17 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".EditingActivity">
-
-        </activity>
+        <activity
+            android:name=".EditingActivity"
+            android:configChanges="orientation"
+            android:hardwareAccelerated="false"
+            android:windowSoftInputMode="adjustPan"></activity>
+        <activity android:name=".MainActivity"></activity>
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-        <activity
-            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/AppTheme" />
+        <activity android:name=".OnBoardingActivity"></activity>
     </application>
 
 </manifest>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_Template"
+            android:icon="@drawable/layout"
+            android:title="Templates" />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/image"
+            android:title="My Gallery" />
+        <item
+            android:id="@+id/nav_favorite"
+            android:icon="@drawable/heart"
+            android:title="Favourites" />
+    </group>
+    <group
+        android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/settings"
+            android:title="Settings" />
+        <item
+            android:id="@+id/nav_howtouse"
+            android:icon="@drawable/howtouse"
+            android:title="How to Use" />
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/aboutus"
+            android:title="About App" />
+        <item
+            android:id="@+id/nav_rateus"
+            android:icon="@drawable/favorite"
+            android:title="Rate us" />
+        <item
+            android:id="@+id/nav_share"
+            android:icon="@drawable/ic_save"
+            android:title="Share" />
+    </group>
+
+
+</menu>

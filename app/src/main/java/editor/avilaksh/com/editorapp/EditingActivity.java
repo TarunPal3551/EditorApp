@@ -1,26 +1,42 @@
 package editor.avilaksh.com.editorapp;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yalantis.ucrop.UCrop;
@@ -31,21 +47,23 @@ import com.zomato.photofilters.imageprocessors.subfilters.SaturationSubfilter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+import editor.avilaksh.com.editorapp.Adapter.CustomSpinnerAdapter;
 import editor.avilaksh.com.editorapp.Adapter.ViewPagerAdapter;
-import editor.avilaksh.com.editorapp.Interface.AddFrameListener;
 import editor.avilaksh.com.editorapp.Interface.AddTextFragmentListener;
-import editor.avilaksh.com.editorapp.Interface.BrushFragmentListener;
 import editor.avilaksh.com.editorapp.Interface.EditImageFragmentListener;
-import editor.avilaksh.com.editorapp.Interface.EmojiFragmentListener;
 import editor.avilaksh.com.editorapp.Interface.FiltersListFragmentListener;
 import editor.avilaksh.com.editorapp.Utils.Bitmap_Utils;
+import editor.avilaksh.com.editorapp.Utils.FontItem;
 import ja.burhanrashid52.photoeditor.OnSaveBitmap;
 import ja.burhanrashid52.photoeditor.PhotoEditor;
 import ja.burhanrashid52.photoeditor.PhotoEditorView;
+import yuku.ambilwarna.AmbilWarnaDialog;
 
-public class EditingActivity extends AppCompatActivity implements FiltersListFragmentListener, EditImageFragmentListener, BrushFragmentListener, EmojiFragmentListener, AddTextFragmentListener, AddFrameListener {
+public class EditingActivity extends AppCompatActivity implements FiltersListFragmentListener, EditImageFragmentListener, AddTextFragmentListener {
     public static final String picture_name = "flash.png";
 
     public static final int PERMISSION_PICK_IMAGE = 1000;
@@ -70,6 +88,9 @@ public class EditingActivity extends AppCompatActivity implements FiltersListFra
     float constrantFinal = 1.0f;
 
     Uri image_selected_uri;
+    EditText myEditText;
+    float dX, dY;
+
 
     //load native image filter lib
 
@@ -80,7 +101,45 @@ public class EditingActivity extends AppCompatActivity implements FiltersListFra
 
     RelativeLayout topbarEditor;
     ImageView open_Image, save_image, undo_Image;
+    private ImageView button;
+    AddTextFragmentListener listener;
 
+    EditText edit_add_text;
+    Button btn_done;
+    Spinner fontStyleSpinner;
+    ImageView colorImageView;
+    RelativeLayout textEditLayout;
+    Typeface typefaceSelected = Typeface.DEFAULT;
+    int mDefaultColor;
+    List<FontItem> fontItems;
+    ImageView closeAddText;
+
+
+    static AddTextFragment instance;
+    private SeekBar spacingSeekbar;
+    private SeekBar textsizeSeekbar;
+    private TextView textViewTextSizeNumberView;
+    private TextView textViewTextSize;
+    private TextView textViewSpacingNumberView;
+    private ImageView textAligmentImage;
+    private ImageView textBoldImage;
+    private ImageView textItalicImage;
+    private ImageView textCapsImage;
+    private RelativeLayout seekbarSpacingLayout;
+    private RelativeLayout seekbarTextSizelayout;
+    private int textAlligmentCount;
+    private String textAligment = "Center";
+    private String textTyle = "Bold";
+    int textStyle;
+    private float textSpacing = 1;
+    private int textSize = 20;
+
+    RelativeLayout addTextLayout;
+    HorizontalScrollView bottomToolScrollView;
+    private LayoutInflater factory;
+    private View myView;
+    private TextView textView;
+    int textBold = 0, textItalic = 0, textUnderLine = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,13 +153,16 @@ public class EditingActivity extends AppCompatActivity implements FiltersListFra
         open_Image = (ImageView) findViewById(R.id.imageViewopen);
         save_image = (ImageView) findViewById(R.id.imageViewsave);
         undo_Image = (ImageView) findViewById(R.id.imageViewundo);
+        addTextLayout = (RelativeLayout) findViewById(R.id.addtextLayout);
+        addTextLayout.setVisibility(View.GONE);
+        bottomToolScrollView = (HorizontalScrollView) findViewById(R.id.scrollingLayout);
+        bottomToolScrollView.setVisibility(View.VISIBLE);
 
 
         //view
         phoroEditorView = (PhotoEditorView) findViewById(R.id.image_preview);
         photoEditor = new PhotoEditor.Builder(this, phoroEditorView)
                 .setPinchTextScalable(true)
-                .setDefaultEmojiTypeface(Typeface.createFromAsset(getAssets(), "emojione-android.ttf"))
                 .build();
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator);
@@ -125,6 +187,9 @@ public class EditingActivity extends AppCompatActivity implements FiltersListFra
             @Override
             public void onClick(View v) {
 
+                button.setVisibility(View.GONE);
+                addTextLayout.setVisibility(View.GONE);
+                bottomToolScrollView.setVisibility(View.VISIBLE);
                 saveImageFromGallery();
             }
         });
@@ -187,14 +252,21 @@ public class EditingActivity extends AppCompatActivity implements FiltersListFra
 //                emojiFragment.show(getSupportFragmentManager(), emojiFragment.getTag());
 //            }
 //        });
-
+        factory = LayoutInflater.from(EditingActivity.this);
+        myView = factory.inflate(R.layout.checkforaddtext, null);
+        textView = (TextView) myView.findViewById(R.id.textView9);
+        button = (ImageView) myView.findViewById(R.id.button);
         btn_add_text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AddTextFragment addTextFragment = AddTextFragment.getInstance();
-                addTextFragment.setListener(EditingActivity.this);
-                addTextFragment.show(getSupportFragmentManager(), addTextFragment.getTag());
+                addTextLayout.setVisibility(View.VISIBLE);
+                bottomToolScrollView.setVisibility(View.GONE);
+                button.setVisibility(View.VISIBLE);
+                phoroEditorView.addView(myView);
+
+
             }
+
         });
 
 
@@ -218,6 +290,484 @@ public class EditingActivity extends AppCompatActivity implements FiltersListFra
 //        loadImage();
         loadImage(R.drawable.facebook);
 
+        textEditLayout = (RelativeLayout) findViewById(R.id.textEditingLayout);
+        closeAddText = (ImageView) findViewById(R.id.closeButton);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(EditingActivity.this);
+        builder.setTitle("Alert");
+        builder.setMessage("Want to save or edit");
+        closeAddText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+                        saveImageFromGallery();
+                        addTextLayout.setVisibility(View.GONE);
+                        bottomToolScrollView.setVisibility(View.VISIBLE);
+
+
+                        // Do nothing but close the dialog
+
+                        dialog.dismiss();
+                    }
+                });
+                builder.setNegativeButton("Edit", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        // Do nothing
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
+
+
+                // phoroEditorView.removeView(myView);
+            }
+        });
+
+
+        textEditLayout.setVisibility(View.VISIBLE);
+        edit_add_text = (EditText) findViewById(R.id.edt_add_text);
+        btn_done = (Button) findViewById(R.id.buttonaddtext);
+        spacingSeekbar = (SeekBar) findViewById(R.id.seekBarspacing);
+        textsizeSeekbar = (SeekBar) findViewById(R.id.seekBartextsize);
+//        textViewTextSize = (TextView) itemview.findViewById(R.id.fontsize);
+        textViewSpacingNumberView = (TextView) findViewById(R.id.textViewspacingnumber);
+        textViewTextSizeNumberView = (TextView) findViewById(R.id.textViewtextsizenumber);
+        textAligmentImage = (ImageView) findViewById(R.id.textaligment);
+        textBoldImage = (ImageView) findViewById(R.id.textbold);
+        textItalicImage = (ImageView) findViewById(R.id.textitalic);
+        textCapsImage = (ImageView) findViewById(R.id.textcaps);
+        colorImageView = (ImageView) findViewById(R.id.colorpallete);
+
+        seekbarSpacingLayout = (RelativeLayout) findViewById(R.id.spacingSeekbarLayout);
+        seekbarTextSizelayout = (RelativeLayout) findViewById(R.id.textsizelayout);
+
+        fontStyleSpinner = (Spinner) findViewById(R.id.spinnerfonttype);
+        edit_add_text.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                textView.setText(s.toString());
+
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        final String fontStyle[] = {"Select Font Style", "Abel-Regular", "Acme-Regular", "AlfaSlabOne-Regular", "Anton-Regular", "BlackHanSans-Regular"};
+        fontItems = new ArrayList<FontItem>();
+        for (int i = 0; i < fontStyle.length; i++) {
+
+            FontItem item = new FontItem(fontStyle[i]);
+            fontItems.add(item);
+        }
+        CustomSpinnerAdapter spinnerArrayAdapter = new CustomSpinnerAdapter(EditingActivity.this, R.layout.spinneritem, R.id.spinnerTextview, fontItems);// The drop down view
+        fontStyleSpinner.setAdapter(spinnerArrayAdapter);
+        fontStyleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {
+
+                } else {
+                    String selctedFont = fontStyle[position];///FontStyle
+                    typefaceSelected = Typeface.createFromAsset(getAssets(), new StringBuilder("fonts/")
+                            .append(selctedFont + ".ttf").toString());
+                    textView.setTypeface(typefaceSelected);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+//        textViewTextSize.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                seekbarTextSizelayout.setVisibility(View.VISIBLE);
+//
+//            }
+//        });
+        textsizeSeekbar.setMax(100);
+        textsizeSeekbar.setProgress(14);
+        textsizeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                textViewTextSizeNumberView.setText(String.valueOf(progress));
+                // textViewTextSize.setText(String.valueOf(progress));
+                textSize = progress;//////Size of text
+                textView.setTextSize(textSize);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // seekbarTextSizelayout.setVisibility(View.GONE);
+            }
+        });
+        spacingSeekbar.setMax(10);
+        spacingSeekbar.setProgress(0);
+        spacingSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                textViewSpacingNumberView.setText(String.valueOf(progress));
+                // textViewSpacing.setText(String.valueOf(progress));
+                textSpacing = progress;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    textView.setLetterSpacing(textSpacing);/////Text Spacing
+                }
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                //seekbarSpacingLayout.setVisibility(View.GONE);
+
+            }
+        });
+        mDefaultColor = ContextCompat.getColor(EditingActivity.this, R.color.colorPrimary);
+        colorImageView.setBackgroundColor(mDefaultColor);
+        colorImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AmbilWarnaDialog colorPicker = new AmbilWarnaDialog(EditingActivity.this, mDefaultColor, new AmbilWarnaDialog.OnAmbilWarnaListener() {
+                    @Override
+                    public void onCancel(AmbilWarnaDialog dialog) {
+
+                    }
+
+                    @Override
+                    public void onOk(AmbilWarnaDialog dialog, int color) {
+                        mDefaultColor = color;
+                        colorImageView.setBackgroundColor(mDefaultColor);
+                        textView.setTextColor(mDefaultColor);
+
+                    }
+                });
+                colorPicker.show();
+
+
+                //// oolor Pallete dalni hai
+
+
+            }
+        });
+        if (textAlligmentCount == 0) {
+            textAligmentImage.setImageResource(R.drawable.ic_text_align_left);/////RightSideAligmentImage
+            //textAlligmentCount = 1;
+        } else if (textAlligmentCount == 1) {
+            textAligmentImage.setImageResource(R.drawable.ic_text_align_right);/////RightSideAligmentImage
+
+            //////leftSideAligmentImage
+            // textAlligmentCount = 2;
+        } else if (textAlligmentCount == 2) {
+            /////textAlligmentCenterImage
+            // textAlligmentCount = 0;
+            textAligmentImage.setImageResource(R.drawable.ic_text_align_center);/////RightSideAligmentImage
+
+        }
+        textAligmentImage.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+            @Override
+            public void onClick(View v) {
+                if (textAlligmentCount == 0) {
+                    ///setImageofLeftAligment
+                    textAlligmentCount = 1;
+                    textAligment = "Right";
+                    textView.setTextAlignment(myView.TEXT_ALIGNMENT_TEXT_END);
+                    textAligmentImage.setImageResource(R.drawable.ic_text_align_right);
+
+
+                } else if (textAlligmentCount == 1) {
+                    textAlligmentCount = 2;
+                    textAligment = "Center";
+                    textView.setTextAlignment(myView.TEXT_ALIGNMENT_CENTER);
+                    textAligmentImage.setImageResource(R.drawable.ic_text_align_center);
+
+
+                } else if (textAlligmentCount == 2) {
+                    textAlligmentCount = 0;
+                    textAligment = "Left";
+                    textView.setTextAlignment(myView.TEXT_ALIGNMENT_TEXT_START);
+                    textAligmentImage.setImageResource(R.drawable.ic_text_align_left);
+
+
+                }
+
+
+            }
+        });
+
+        textBoldImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (textBold == 0) {
+                    textTyle = "Bold";
+                    textView.setTypeface(typefaceSelected, Typeface.BOLD);
+                    textBold = 1;
+                    textBoldImage.setColorFilter(ContextCompat.getColor(EditingActivity.this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+                } else if (textBold == 1) {
+                    textBold = 0;
+                    textView.setTypeface(typefaceSelected, Typeface.NORMAL);
+                    textBoldImage.setColorFilter(ContextCompat.getColor(EditingActivity.this, R.color.selectedfilter), PorterDuff.Mode.SRC_IN);
+
+
+                }//textBoldImage.setImageResource(R.drawable.ic_emoji_symbols_light);
+                // textItalicImage.setImageResource();
+
+
+            }
+        });
+        textItalicImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (textItalic == 0) {
+                    textTyle = "Italic";
+                    textView.setTypeface(typefaceSelected, Typeface.ITALIC);
+                    textItalic = 1;
+                    textItalicImage.setColorFilter(ContextCompat.getColor(EditingActivity.this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+                } else if (textItalic == 1) {
+                    textItalic = 0;
+                    textView.setTypeface(typefaceSelected, Typeface.NORMAL);
+                    textItalicImage.setColorFilter(ContextCompat.getColor(EditingActivity.this, R.color.selectedfilter), PorterDuff.Mode.SRC_IN);
+
+
+                }
+
+
+            }
+        });
+        textCapsImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (textUnderLine == 0) {
+                    textTyle = "Caps";
+                    textUnderLine = 1;
+                    textView.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
+                    textCapsImage.setColorFilter(ContextCompat.getColor(EditingActivity.this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+                } else if (textUnderLine == 1) {
+                    textView.setPaintFlags(0);
+                    textUnderLine = 0;
+                    textCapsImage.setColorFilter(ContextCompat.getColor(EditingActivity.this, R.color.selectedfilter), PorterDuff.Mode.SRC_IN);
+
+
+                }
+
+
+            }
+        });
+
+
+//        textView.setTextSize(textSize);
+//        if (textAligment.equals("Center")){
+//            textView.setGravity(View.TEXT_ALIGNMENT_CENTER);
+//
+//        }
+//        else if (textAligment.equals("Left")){
+//            textView.setGravity(View.TEXT_ALIGNMENT_TEXT_START);
+//        }
+//        else if (textAligment.equals("Right")){
+//            textView.setGravity(View.TEXT_ALIGNMENT_TEXT_END);
+//        }
+//
+//
+//        if (textTyle.equals("Bold")){
+//            textView.setTypeface(typefaceSelected,Typeface.BOLD);
+//
+//        }
+//        else if(textTyle.equals("Caps")){
+//            String capsText=edit_add_text.getText().toString().toUpperCase();
+//            textView.setTypeface(typefaceSelected);
+//            textView.setText(capsText);
+//
+//        }
+//
+//        else if(textTyle.equals("Italic")){
+//            textView.setTypeface(typefaceSelected,Typeface.ITALIC);
+//
+//        }
+
+
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            textView.setLetterSpacing(textSpacing);
+//        }
+
+//        myEditText = new EditText(EditingActivity.this);
+//        RelativeLayout.LayoutParams mRparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//        myEditText.setLayoutParams(mRparams);
+//        phoroEditorView.addView(myEditText);
+
+
+        myView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                button.setVisibility(View.VISIBLE);
+                switch (event.getAction()) {
+
+                    case MotionEvent.ACTION_DOWN:
+
+                        dX = view.getX() - event.getRawX();
+                        dY = view.getY() - event.getRawY();
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+
+                        view.animate()
+                                .x(event.getRawX() + dX)
+                                .y(event.getRawY() + dY)
+                                .setDuration(0)
+                                .start();
+                        break;
+                    default:
+                        return false;
+
+                }
+
+                return true; // Don't miss to return as true
+            }
+
+            @Override
+            protected void finalize() throws Throwable {
+                super.finalize();
+            }
+        });
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                phoroEditorView.removeView(myView);
+                bottomToolScrollView.setVisibility(View.VISIBLE);
+                addTextLayout.setVisibility(View.GONE);
+            }
+        });
+
+
+//        listener.OnAddTextButtonClick(typefaceSelected, edit_add_text.getText().toString(), mDefaultColor,textTyle,textAligment,textSpacing,textSize);
+//
+//         listener.OnAddTextButtonClick(typefaceSelected, edit_add_text.getText().toString(), mDefaultColor, "Bold", Gravity.CENTER, 5, 20);
+
+//        btn_done.setOnClickListener(new View.OnClickListener() {
+//            @SuppressLint("WrongConstant")
+//            @Override
+//            public void onClick(View v) {
+//                listener.OnAddTextButtonClick(typefaceSelected, edit_add_text.getText().toString(), mDefaultColor,textTyle,textAligment,textSpacing,textSize);
+//            }
+//        });
+
+
+    }
+
+    @Override
+    public void OnAddTextButtonClick(Typeface typeface, String text, int color, String textStyle, String textalligment, float spacing, int textsize) {
+
+        //photoEditor.addText(typeface, text, color);
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View myView = factory.inflate(R.layout.checkforaddtext, null);
+        TextView textView = (TextView) myView.findViewById(R.id.textView9);
+        button = (ImageView) myView.findViewById(R.id.button);
+
+        textView.setTextSize(textsize);
+        if (textalligment.equals("Center")) {
+            textView.setGravity(View.TEXT_ALIGNMENT_CENTER);
+
+        } else if (textalligment.equals("Left")) {
+            textView.setGravity(View.TEXT_ALIGNMENT_TEXT_START);
+        } else if (textalligment.equals("Right")) {
+            textView.setGravity(View.TEXT_ALIGNMENT_TEXT_END);
+        }
+        textView.setText(text);
+        textView.setTextColor(color);
+
+
+        if (textStyle.equals("Bold")) {
+            textView.setTypeface(typeface, Typeface.BOLD);
+
+
+        } else if (textStyle.equals("Caps")) {
+            String capsText = text.toUpperCase();
+            textView.setTypeface(typeface);
+            textView.setText(capsText);
+
+        } else if (textStyle.equals("Italic")) {
+            textView.setTypeface(typeface, Typeface.ITALIC);
+
+        }
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            textView.setLetterSpacing(spacing);
+        }
+        phoroEditorView.addView(myView);
+
+//        myEditText = new EditText(EditingActivity.this);
+//        RelativeLayout.LayoutParams mRparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//        myEditText.setLayoutParams(mRparams);
+//        phoroEditorView.addView(myEditText);
+
+        myView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                button.setVisibility(View.VISIBLE);
+                switch (event.getAction()) {
+
+                    case MotionEvent.ACTION_DOWN:
+
+                        dX = view.getX() - event.getRawX();
+                        dY = view.getY() - event.getRawY();
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+
+                        view.animate()
+                                .x(event.getRawX() + dX)
+                                .y(event.getRawY() + dY)
+                                .setDuration(0)
+                                .start();
+                        break;
+                    default:
+                        return false;
+
+                }
+
+                return true; // Don't miss to return as true
+            }
+
+            @Override
+            protected void finalize() throws Throwable {
+                super.finalize();
+            }
+        });
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                phoroEditorView.removeView(myView);
+            }
+        });
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
 
     }
 
@@ -268,14 +818,12 @@ public class EditingActivity extends AppCompatActivity implements FiltersListFra
                         }).show();
 
 
-            }
-            else {
+            } else {
                 ActivityCompat.requestPermissions(EditingActivity.this,
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, MULTIPLE_PERMISSIONS);
 
             }
-        }
-        else {
+        } else {
             Intent intent = new Intent(Intent.ACTION_PICK);
             intent.setType("image/*");
             startActivityForResult(intent, PERMISSION_INSERT_IMAGE);
@@ -437,6 +985,7 @@ public class EditingActivity extends AppCompatActivity implements FiltersListFra
     }
 
     private void saveImageFromGallery() {
+
         if (ContextCompat.checkSelfPermission(EditingActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) +
                 ContextCompat.checkSelfPermission(EditingActivity.this,
                         Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -464,6 +1013,7 @@ public class EditingActivity extends AppCompatActivity implements FiltersListFra
 
             }
         } else {
+            button.setVisibility(View.GONE);
             photoEditor.saveAsBitmap(new OnSaveBitmap() {
                 @Override
                 public void onBitmapReady(Bitmap saveBitmap) {
@@ -479,9 +1029,12 @@ public class EditingActivity extends AppCompatActivity implements FiltersListFra
                                 public void onClick(View view) {
                                     openImage(path);
 
+
                                 }
                             });
                             snackbar.show();
+                            phoroEditorView.removeView(myView);
+                            button.setVisibility(View.VISIBLE);
 
                         } else {
                             Snackbar snackbar = Snackbar.make(coordinatorLayout, "Unable to save Image",
@@ -752,46 +1305,4 @@ public class EditingActivity extends AppCompatActivity implements FiltersListFra
     }
 
 
-    @Override
-    public void onBrushSizeChangeListener(Float size) {
-        photoEditor.setBrushSize(size);
-    }
-
-    @Override
-    public void onBrushopacityChangeListener(int opacity) {
-
-        photoEditor.setOpacity(opacity);
-
-    }
-
-    @Override
-    public void onBrushColorChangedListener(int color) {
-        photoEditor.setBrushColor(color);
-
-    }
-
-    @Override
-    public void onBrushStateChangedListener(boolean isEraser) {
-        if (isEraser)
-            photoEditor.brushEraser();
-        else
-            photoEditor.setBrushDrawingMode(true);
-    }
-
-    @Override
-    public void onEmojiSelected(String emoji) {
-        photoEditor.addEmoji(emoji);
-    }
-
-
-    @Override
-    public void OnAddTextButtonClick(Typeface typeface, String text, int color) {
-        photoEditor.addText(typeface, text, color);
-    }
-
-    @Override
-    public void onAddFrame(int frame) {
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), frame);
-        photoEditor.addImage(bitmap);
-    }
 }
