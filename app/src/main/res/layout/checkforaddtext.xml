@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="center">
+    android:layout_gravity="center"
+    android:foregroundGravity="center">
 
     <TextView
         android:id="@+id/textView9"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"
-        android:textColor="@color/colorPrimary"
-        />
+        android:textColor="@color/colorPrimary" />
 
     <ImageView
         android:id="@+id/button"
@@ -19,8 +18,8 @@
         android:layout_height="20dp"
         android:layout_toEndOf="@+id/textView9"
         android:layout_toRightOf="@+id/textView9"
-        android:tint="@android:color/black"
         android:contentDescription="Cancel Image"
-        android:src="@drawable/close"/>
+        android:src="@drawable/close"
+        android:tint="@android:color/black" />
 
 </RelativeLayout>

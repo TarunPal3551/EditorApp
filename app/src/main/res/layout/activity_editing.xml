@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".EditingActivity"
+    tools:context="editor.avilaksh.com.edi.EditingActivity"
     android:id="@+id/coordinator"
     android:background="@android:color/transparent">
     <include layout="@layout/editing_content"/>

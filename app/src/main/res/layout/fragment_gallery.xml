@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".GalleryFragment"
+    tools:context="editor.avilaksh.com.edi.GalleryFragment"
     android:id="@+id/myGalleryLayout">
 
     <!-- TODO: Update blank fragment layout -->

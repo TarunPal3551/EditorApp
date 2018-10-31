@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SplashActivity">
+        <activity android:name="editor.avilaksh.com.edi.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,16 +25,18 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity
-            android:name=".EditingActivity"
+            android:name="editor.avilaksh.com.edi.EditingActivity"
             android:configChanges="orientation"
             android:hardwareAccelerated="false"
-            android:windowSoftInputMode="adjustPan"></activity>
-        <activity android:name=".MainActivity"></activity>
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name="editor.avilaksh.com.edi.MainActivity" />
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-        <activity android:name=".OnBoardingActivity"></activity>
+        <activity android:name="editor.avilaksh.com.edi.OnBoardingActivity" />
+        <activity android:name="editor.avilaksh.com.edi.InputProfile" />
+        <activity android:name="editor.avilaksh.com.edi.VistingCardEditingActivity"></activity>
     </application>
 
 </manifest>

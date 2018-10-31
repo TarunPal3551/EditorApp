@@ -6,6 +6,7 @@ android {
         applicationId "editor.avilaksh.com.editorapp"
         minSdkVersion 16
         targetSdkVersion 27
+        buildToolsVersion '26.0.2'
         versionCode 1
         versionName "1.0"
         vectorDrawables.useSupportLibrary = true
@@ -38,6 +39,7 @@ dependencies {
     implementation 'com.github.rockerhieu:emojicon:v1.4.2'
     implementation 'ja.burhanrashid52:photoeditor:0.3.3'
     implementation 'com.github.yukuku:ambilwarna:2.0.1'
+    implementation 'com.squareup.picasso:picasso:2.71828'
 
 
 }
