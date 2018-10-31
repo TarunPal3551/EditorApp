@@ -1,4 +1,4 @@
-package editor.avilaksh.com.edi;
+package editor.avilaksh.com.editorapp;
 
 import android.content.Intent;
 import android.os.Handler;
@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.RelativeLayout;
-import editor.avilaksh.com.editorapp.R;
 
 public class SplashActivity extends AppCompatActivity {
     RelativeLayout layout;

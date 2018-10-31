@@ -1,4 +1,4 @@
-package editor.avilaksh.com.edi.Utils;
+package editor.avilaksh.com.editorapp.Utils;
 
 public class FontItem {
     String fontFamilyName;

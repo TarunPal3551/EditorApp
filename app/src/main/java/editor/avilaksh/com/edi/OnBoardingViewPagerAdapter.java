@@ -1,4 +1,4 @@
-package editor.avilaksh.com.edi;
+package editor.avilaksh.com.editorapp;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

@@ -1,7 +1,6 @@
-package editor.avilaksh.com.edi;
+package editor.avilaksh.com.editorapp;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -15,8 +14,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import editor.avilaksh.com.editorapp.R;
-
 public class OnBoardingActivity extends FragmentActivity {
     ViewPager mPager;
     PagerAdapter mPagerAdapter;
@@ -29,77 +26,63 @@ public class OnBoardingActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_on_boarding);
-        browse = (Button) findViewById(R.id.buttonbrowse);
+        browse=(Button)findViewById(R.id.buttonbrowse);
         Typeface typeface = ResourcesCompat.getFont(OnBoardingActivity.this, R.font.poppins);
         browse.setTypeface(typeface);
-        // signin=(Button)findViewById(R.id.buttonsignin);
+       // signin=(Button)findViewById(R.id.buttonsignin);
         //signin.setTypeface(typeface);
         browse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences spf = getSharedPreferences("DATA", MODE_PRIVATE);
-                String string1 = spf.getString("firstName", null);
-                String string2 = spf.getString("lastName", null);
-                if (string1==null && string2==null) {
-                    Intent intent = new Intent(OnBoardingActivity.this, InputProfile.class);
-                    startActivity(intent);
-                    //Toast.makeText(OnBoardingActivity.this, "Profile Info saved", Toast.LENGTH_LONG).show();
-
-                } else {
-                    Intent intent = new Intent(OnBoardingActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-
-
-                }
-
+                Intent intent=new Intent(OnBoardingActivity.this,MainActivity.class);
+                startActivity(intent);
 
             }
         });
 
-        mPager = (ViewPager) findViewById(R.id.viewpageronboarding);
-        dot_layout = (LinearLayout) findViewById(R.id.dotslayoutonboarding);
-        mPagerAdapter = new OnBoardingViewPagerAdapter(getSupportFragmentManager());
+        mPager=(ViewPager)findViewById(R.id.viewpageronboarding);
+        dot_layout=(LinearLayout)findViewById(R.id.dotslayoutonboarding);
+        mPagerAdapter=new OnBoardingViewPagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
-        createdots(mPager.getCurrentItem());
-        mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+       createdots(mPager.getCurrentItem());
+       mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+           @Override
+           public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-            }
+           }
 
-            @Override
-            public void onPageSelected(int position) {
-                for (int i = 0; i < 3; i++) {
+           @Override
+           public void onPageSelected(int position) {
+               for (int i=0;i<3;i++){
 
-                    dots[i].setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.default_dots));
-                }
-                dots[position].setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.active_dots));
+                   dots[i].setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.default_dots));
+               }
+               dots[position].setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.active_dots));
 
 
-            }
+           }
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
+           @Override
+           public void onPageScrollStateChanged(int state) {
 
-            }
-        });
+           }
+       });
 
     }
 
     @Override
     public void onBackPressed() {
-        if (mPager.getCurrentItem() == 0) {
+        if (mPager.getCurrentItem()==0){
             super.onBackPressed();
 
 
-        } else {
-            mPager.setCurrentItem(mPager.getCurrentItem() - 1);
+        }
+        else {
+            mPager.setCurrentItem(mPager.getCurrentItem()-1);
         }
 
 
     }
-
     public void createdots(int current_position) {
         if (dot_layout != null) {
             dot_layout.removeAllViews();

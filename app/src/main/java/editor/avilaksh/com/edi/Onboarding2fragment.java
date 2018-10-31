@@ -1,4 +1,4 @@
-package editor.avilaksh.com.edi;
+package editor.avilaksh.com.editorapp;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -8,8 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import editor.avilaksh.com.editorapp.R;
 
 public class Onboarding2fragment extends android.support.v4.app.Fragment{
     TextView texthead,textdescp;

@@ -1,4 +1,4 @@
-package editor.avilaksh.com.edi.Adapter;
+package editor.avilaksh.com.editorapp.Adapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -13,7 +13,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import editor.avilaksh.com.editorapp.R;
-import editor.avilaksh.com.edi.Utils.FontItem;
+import editor.avilaksh.com.editorapp.Utils.FontItem;
 
 public class CustomSpinnerAdapter extends ArrayAdapter<FontItem> {
     LayoutInflater inflater;
